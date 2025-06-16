@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
 
   const NavigationBar = () => (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg border-t border-lavender-200 z-50 md:relative md:border-t-0 md:bg-transparent md:shadow-none">
@@ -58,7 +58,7 @@ const Index = () => {
         </div>
         <Button 
           className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-nunito rounded-full px-6 shadow-lg"
-          onClick={() => setActiveSection('home')}
+          onClick={() => window.location.href = '/auth'}
         >
           Sign Up 🎉
         </Button>
@@ -92,21 +92,21 @@ const Index = () => {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => setActiveSection('home')}
+                onClick={() => window.location.href = '/auth'}
               >
                 💡 Start Learning
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => setActiveSection('mentorship')}
+                onClick={() => window.location.href = '/auth'}
               >
                 🤝 Find a Mentor
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-lavender-500 to-lavender-600 hover:from-lavender-600 hover:to-lavender-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => setActiveSection('learning')}
+                onClick={() => window.location.href = '/auth'}
               >
                 🧘 Relax Mode
               </Button>
@@ -174,6 +174,9 @@ const Index = () => {
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-5 w-5 text-coral-500" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-coral-500 rounded-full"></span>
+            </Button>
+            <Button variant="ghost" onClick={signOut}>
+              Sign Out
             </Button>
             <Avatar className="w-12 h-12 border-2 border-lavender-300">
               <AvatarFallback className="bg-gradient-to-br from-coral-400 to-lavender-500 text-white font-bold">
@@ -538,7 +541,7 @@ const Index = () => {
                   </div>
                 </div>
                 
-                <p className="text-gray-700 mb-4 whitespace-re-line font-nunito leading-relaxed">{post.content}</p>
+                <p className="text-gray-700 mb-4 whitespace-pre-line font-nunito leading-relaxed">{post.content}</p>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
