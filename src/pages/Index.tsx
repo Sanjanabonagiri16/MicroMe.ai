@@ -6,6 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, Star, MessageCircle, BookOpen, Users, Shield, Sparkles, Trophy, Calendar, User, Home, GraduationCap, MessageSquare, Activity, Bell, Search, Play, CheckCircle, Clock, Award, Target, Palette, Send, Camera, Volume2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { LearningHub } from '@/components/learning/LearningHub';
+import { MentorshipDashboard } from '@/components/mentorship/MentorshipDashboard';
+import { CommunityEvents } from '@/components/community/CommunityEvents';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -298,179 +301,6 @@ const Index = () => {
     </div>
   );
 
-  const LearningHub = () => (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-lavender-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold font-poppins text-gray-800 mb-4">📚 Learning Hub</h1>
-          <p className="text-xl text-gray-600 font-nunito">Discover courses designed just for you</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              title: "Confidence Building",
-              progress: 75,
-              level: "Beginner",
-              lessons: 8,
-              color: "coral",
-              gradient: "from-coral-400 to-coral-500",
-              description: "Build unshakeable self-confidence"
-            },
-            {
-              title: "Coding Fundamentals",
-              progress: 30,
-              level: "Beginner",
-              lessons: 12,
-              color: "lavender",
-              gradient: "from-lavender-400 to-lavender-500",
-              description: "Start your tech journey"
-            },
-            {
-              title: "Life Skills Mastery",
-              progress: 90,
-              level: "Intermediate",
-              lessons: 10,
-              color: "teal",
-              gradient: "from-teal-400 to-teal-500",
-              description: "Essential skills for success"
-            }
-          ].map((course, index) => (
-            <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer group">
-              <CardContent className="p-8">
-                <div className={`w-full h-40 bg-gradient-to-br ${course.gradient} rounded-2xl mb-6 flex items-center justify-center group-hover:animate-bounce`}>
-                  <BookOpen className="text-white" size={48} />
-                </div>
-                <h3 className="font-bold text-gray-800 mb-3 font-poppins text-xl">{course.title}</h3>
-                <p className="text-gray-600 mb-6 font-nunito">{course.description}</p>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500 font-nunito">Progress</span>
-                    <span className="font-bold text-gray-800">{course.progress}%</span>
-                  </div>
-                  <Progress value={course.progress} className="h-3" />
-                  
-                  <div className="flex justify-between items-center">
-                    <Badge className={`bg-${course.color}-100 text-${course.color}-700 font-nunito`}>
-                      {course.level}
-                    </Badge>
-                    <span className="text-sm text-gray-500 font-nunito">{course.lessons} lessons</span>
-                  </div>
-                  
-                  <Button className={`w-full bg-gradient-to-r ${course.gradient} hover:opacity-90 text-white rounded-full font-poppins`}>
-                    Continue Learning ▶️
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const MentorshipArea = () => (
-    <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-coral-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold font-poppins text-gray-800 mb-4">🌟 Your Mentors</h1>
-          <p className="text-xl text-gray-600 font-nunito">Connect with amazing women who believe in you</p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {/* Active Mentor Chat */}
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-2xl font-poppins text-lavender-700">💬 Mentor Chat</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4 mb-6 bg-gradient-to-r from-lavender-50 to-lavender-100 p-4 rounded-2xl">
-                <Avatar className="w-16 h-16 border-2 border-lavender-300">
-                  <AvatarFallback className="bg-gradient-to-br from-lavender-400 to-lavender-500 text-white text-lg font-bold">
-                    DR
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-800 font-poppins">Dr. Meera Rao</h3>
-                  <p className="text-sm text-gray-600 font-nunito">Software Engineer & Tech Lead</p>
-                  <div className="flex items-center mt-1">
-                    <Star className="text-yellow-400 fill-current" size={16} />
-                    <span className="text-sm text-gray-600 ml-1 font-nunito">4.9 rating</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Chat Messages */}
-              <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
-                <div className="bg-gray-100 p-4 rounded-2xl rounded-bl-sm">
-                  <p className="text-sm text-gray-600 font-nunito mb-1">You</p>
-                  <p className="text-gray-800 font-nunito">I feel nervous before speaking in class.</p>
-                </div>
-                <div className="bg-gradient-to-r from-lavender-400 to-lavender-500 text-white p-4 rounded-2xl rounded-br-sm ml-8">
-                  <p className="text-sm opacity-90 mb-1">Dr. Meera</p>
-                  <p>Let's try a breathing exercise together. Remember, your voice matters! 🌟</p>
-                </div>
-              </div>
-              
-              <div className="flex space-x-2">
-                <input 
-                  type="text" 
-                  placeholder="Type your message..." 
-                  className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:border-lavender-400 font-nunito"
-                />
-                <Button className="bg-lavender-500 hover:bg-lavender-600 text-white rounded-full px-4">
-                  <Send size={18} />
-                </Button>
-                <Button variant="outline" className="rounded-full px-4">
-                  <Volume2 size={18} />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Session Info */}
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-2xl font-poppins text-teal-700">📅 Session Schedule</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-gradient-to-r from-teal-50 to-teal-100 p-6 rounded-2xl mb-6">
-                <h4 className="font-bold text-gray-800 mb-2 font-poppins">Next Session</h4>
-                <p className="text-teal-600 font-semibold mb-1">Tomorrow, 4:00 PM</p>
-                <p className="text-sm text-gray-600 font-nunito">Topic: Building Your First Website</p>
-                <Button className="w-full mt-4 bg-teal-500 hover:bg-teal-600 text-white rounded-full font-poppins">
-                  Join Session 🚀
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-bold text-gray-800 font-poppins">Recent Sessions</h4>
-                {[
-                  { topic: "Career Planning", date: "2 days ago", rating: 5 },
-                  { topic: "Stress Management", date: "1 week ago", rating: 5 },
-                  { topic: "Public Speaking", date: "2 weeks ago", rating: 4 }
-                ].map((session, index) => (
-                  <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl">
-                    <div>
-                      <p className="font-semibold text-gray-800 font-poppins">{session.topic}</p>
-                      <p className="text-sm text-gray-600 font-nunito">{session.date}</p>
-                    </div>
-                    <div className="flex">
-                      {[...Array(session.rating)].map((_, i) => (
-                        <Star key={i} className="text-yellow-400 fill-current" size={16} />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-
   const CommunityWall = () => (
     <div className="min-h-screen bg-gradient-to-br from-coral-50 via-white to-lavender-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -502,65 +332,71 @@ const Index = () => {
           </CardContent>
         </Card>
 
+        {/* Community Events */}
+        <CommunityEvents />
+
         {/* Posts Grid - Pinterest Style */}
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-          {[
-            {
-              author: "Ananya K.",
-              content: "Just finished my first coding project! 🎉 It's a simple calculator but I'm so proud. Thank you to my mentor Priya for believing in me!",
-              likes: 45,
-              comments: 12,
-              color: "coral"
-            },
-            {
-              author: "Riya M.",
-              content: "Poem I wrote today:\n\n'She believed she could,\nSo she did.\nOne step at a time,\nOne dream fulfilled.'",
-              likes: 67,
-              comments: 8,
-              color: "lavender"
-            },
-            {
-              author: "Kavya S.",
-              content: "Sharing my art piece about women supporting women. Every stroke represents strength! 🎨",
-              likes: 89,
-              comments: 15,
-              color: "teal"
-            }
-          ].map((post, index) => (
-            <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 break-inside-avoid mb-6 cursor-pointer group">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <Avatar className="w-12 h-12">
-                    <AvatarFallback className={`bg-gradient-to-br from-${post.color}-400 to-${post.color}-500 text-white font-bold`}>
-                      {post.author[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-gray-800 font-poppins">{post.author}</p>
-                    <p className="text-xs text-gray-500 font-nunito">2 hours ago</p>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold font-poppins text-gray-800 mb-6">Recent Community Posts</h2>
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            {[
+              {
+                author: "Ananya K.",
+                content: "Just finished my first coding project! 🎉 It's a simple calculator but I'm so proud. Thank you to my mentor Priya for believing in me!",
+                likes: 45,
+                comments: 12,
+                color: "coral"
+              },
+              {
+                author: "Riya M.",
+                content: "Poem I wrote today:\n\n'She believed she could,\nSo she did.\nOne step at a time,\nOne dream fulfilled.'",
+                likes: 67,
+                comments: 8,
+                color: "lavender"
+              },
+              {
+                author: "Kavya S.",
+                content: "Sharing my art piece about women supporting women. Every stroke represents strength! 🎨",
+                likes: 89,
+                comments: 15,
+                color: "teal"
+              }
+            ].map((post, index) => (
+              <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 break-inside-avoid mb-6 cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Avatar className="w-12 h-12">
+                      <AvatarFallback className={`bg-gradient-to-br from-${post.color}-400 to-${post.color}-500 text-white font-bold`}>
+                        {post.author[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-semibold text-gray-800 font-poppins">{post.author}</p>
+                      <p className="text-xs text-gray-500 font-nunito">2 hours ago</p>
+                    </div>
                   </div>
-                </div>
-                
-                <p className="text-gray-700 mb-4 whitespace-pre-line font-nunito leading-relaxed">{post.content}</p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <button className="flex items-center space-x-2 text-coral-500 hover:text-coral-600 transition-colors group-hover:animate-pulse">
-                      <Heart size={18} />
-                      <span className="font-nunito">{post.likes}</span>
-                    </button>
-                    <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-600 transition-colors">
-                      <MessageCircle size={18} />
-                      <span className="font-nunito">{post.comments}</span>
-                    </button>
+                  
+                  <p className="text-gray-700 mb-4 whitespace-pre-line font-nunito leading-relaxed">{post.content}</p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <button className="flex items-center space-x-2 text-coral-500 hover:text-coral-600 transition-colors group-hover:animate-pulse">
+                        <Heart size={18} />
+                        <span className="font-nunito">{post.likes}</span>
+                      </button>
+                      <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-600 transition-colors">
+                        <MessageCircle size={18} />
+                        <span className="font-nunito">{post.comments}</span>
+                      </button>
+                    </div>
+                    <Badge className="bg-gradient-to-r from-coral-400 to-lavender-400 text-white font-nunito">
+                      🌟 Empowered
+                    </Badge>
                   </div>
-                  <Badge className="bg-gradient-to-r from-coral-400 to-lavender-400 text-white font-nunito">
-                    🌟 Empowered
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -656,7 +492,7 @@ const Index = () => {
     if (!user) return <LandingSection />;
     if (activeSection === 'home') return <Dashboard />;
     if (activeSection === 'learning') return <LearningHub />;
-    if (activeSection === 'mentorship') return <MentorshipArea />;
+    if (activeSection === 'mentorship') return <MentorshipDashboard />;
     if (activeSection === 'community') return <CommunityWall />;
     if (activeSection === 'toolkit') return <LifeToolkit />;
     return <Dashboard />;
