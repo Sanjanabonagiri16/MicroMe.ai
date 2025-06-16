@@ -63,7 +63,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for the platform
+				// Custom Microme.ai colors
 				lavender: {
 					50: '#F8F6FF',
 					100: '#F0EBFF',
@@ -82,7 +82,7 @@ export default {
 					200: '#FFD6D9',
 					300: '#FFC2C7',
 					400: '#FFADB5',
-					500: '#FF7F7F',
+					500: '#FF6F61',
 					600: '#FF5A5A',
 					700: '#FF3535',
 					800: '#E61F1F',
@@ -94,7 +94,7 @@ export default {
 					200: '#99F6E4',
 					300: '#5EEAD4',
 					400: '#2DD4BF',
-					500: '#20B2AA',
+					500: '#008080',
 					600: '#0D9488',
 					700: '#0F766E',
 					800: '#115E59',
@@ -105,6 +105,10 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			fontFamily: {
+				'poppins': ['Poppins', 'sans-serif'],
+				'nunito': ['Nunito', 'sans-serif'],
 			},
 			keyframes: {
 				'accordion-down': {
@@ -142,13 +146,31 @@ export default {
 						transform: 'scale(1)',
 						opacity: '1'
 					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-10px)'
+					}
+				},
+				'pulse-slow': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.5'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'scale-in': 'scale-in 0.2s ease-out'
+				'scale-in': 'scale-in 0.2s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
 	},
