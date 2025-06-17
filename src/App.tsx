@@ -10,6 +10,9 @@ import Mentors from "./pages/Mentors";
 import Learn from "./pages/Learn";
 import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
+import TermsOfService from "./pages/TermsOfService";
 import { AuthPage } from "./components/auth/AuthPage";
 import { AuthProvider } from "@/hooks/useAuth";
 
@@ -29,6 +32,9 @@ const App = () => (
             <Route path="/learn" element={<Learn />} />
             <Route path="/journal" element={<Journal />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/safety-guidelines" element={<SafetyGuidelines />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -3,6 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 import { 
   Heart, 
   Users, 
@@ -23,6 +24,8 @@ import {
 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
   const impactStats = [
     { icon: Users, label: "Girls Empowered", value: "25,000+", color: "coral" },
     { icon: BookOpen, label: "Learning Hours", value: "50,000+", color: "lavender" },
@@ -177,7 +180,9 @@ export const Footer: React.FC = () => {
                 <Button size="sm" className="bg-lavender-400 hover:bg-lavender-500 text-white rounded-full p-2">
                   <Twitter size={16} />
                 </Button>
-                <Button size="sm" className="bg-teal-400 hover:bg-teal-500 text-white rounded-full p-2">
+                <Button size="sm" className="bg-t
+
+eal-400 hover:bg-teal-500 text-white rounded-full p-2">
                   <Youtube size={16} />
                 </Button>
               </div>
@@ -207,9 +212,24 @@ export const Footer: React.FC = () => {
             </div>
             
             <div className="flex items-center space-x-6 text-sm font-nunito">
-              <span>Privacy Policy</span>
-              <span>Safety Guidelines</span>
-              <span>Terms of Service</span>
+              <button 
+                onClick={() => navigate('/privacy-policy')}
+                className="hover:text-coral-300 transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button 
+                onClick={() => navigate('/safety-guidelines')}
+                className="hover:text-coral-300 transition-colors"
+              >
+                Safety Guidelines
+              </button>
+              <button 
+                onClick={() => navigate('/terms-of-service')}
+                className="hover:text-coral-300 transition-colors"
+              >
+                Terms of Service
+              </button>
               <span>© 2024 Microme.ai</span>
             </div>
           </div>

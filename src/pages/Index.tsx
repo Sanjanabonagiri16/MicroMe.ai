@@ -98,12 +98,27 @@ const Index = () => {
           <button onClick={() => navigate('/learn')} className="text-gray-600 hover:text-coral-500 transition-colors">Learn</button>
           <button onClick={() => navigate('/journal')} className="text-gray-600 hover:text-coral-500 transition-colors">Journal</button>
         </div>
-        <Button 
-          className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-nunito rounded-full px-6 shadow-lg"
-          onClick={() => navigate('/auth')}
-        >
-          Sign Up 🎉
-        </Button>
+        {!user ? (
+          <Button 
+            className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-nunito rounded-full px-6 shadow-lg"
+            onClick={() => navigate('/auth')}
+          >
+            Sign Up 🎉
+          </Button>
+        ) : (
+          <div className="flex items-center space-x-4">
+            <span className="text-sm font-nunito text-gray-600">
+              Welcome, {profile?.first_name || 'User'}!
+            </span>
+            <Button 
+              variant="outline"
+              onClick={signOut}
+              className="rounded-full"
+            >
+              Sign Out
+            </Button>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -529,9 +544,7 @@ const Index = () => {
   );
 
   const renderSection = () => {
-    if (!user) return <LandingSection />;
     if (activeSection === 'community') return <CommunityWall />;
-    // Default to landing for authenticated users on main page
     return <LandingSection />;
   };
 
