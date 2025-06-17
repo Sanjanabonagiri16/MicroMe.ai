@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { LearningHub } from '@/components/learning/LearningHub';
 import { MentorshipDashboard } from '@/components/mentorship/MentorshipDashboard';
 import { CommunityEvents } from '@/components/community/CommunityEvents';
 import { Footer } from '@/components/layout/Footer';
+import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Users, 
@@ -50,20 +50,21 @@ import {
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const NavigationBar = () => (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg border-t border-lavender-200 z-50 md:relative md:border-t-0 md:bg-transparent md:shadow-none">
       <div className="flex justify-around items-center p-3 max-w-md mx-auto md:max-w-none md:justify-start md:space-x-6">
         {[
-          { id: 'home', icon: Home, label: 'Home', color: 'coral' },
-          { id: 'learning', icon: GraduationCap, label: 'Learn', color: 'lavender' },
-          { id: 'mentorship', icon: MessageSquare, label: 'Mentors', color: 'teal' },
-          { id: 'community', icon: Users, label: 'Community', color: 'coral' },
-          { id: 'toolkit', icon: Activity, label: 'Wellness', color: 'lavender' }
-        ].map(({ id, icon: Icon, label, color }) => (
+          { id: 'home', icon: Home, label: 'Home', color: 'coral', route: '/home' },
+          { id: 'learning', icon: GraduationCap, label: 'Learn', color: 'lavender', route: '/learn' },
+          { id: 'mentorship', icon: MessageSquare, label: 'Mentors', color: 'teal', route: '/mentors' },
+          { id: 'community', icon: Users, label: 'Community', color: 'coral', route: '#' },
+          { id: 'toolkit', icon: Activity, label: 'Journal', color: 'lavender', route: '/journal' }
+        ].map(({ id, icon: Icon, label, color, route }) => (
           <button
             key={id}
-            onClick={() => setActiveSection(id)}
+            onClick={() => route !== '#' ? navigate(route) : setActiveSection(id)}
             className={`flex flex-col items-center space-y-1 p-3 rounded-2xl transition-all duration-300 ${
               activeSection === id 
                 ? `text-${color}-600 bg-${color}-100 shadow-lg scale-110` 
@@ -98,7 +99,7 @@ const Index = () => {
         </div>
         <Button 
           className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-nunito rounded-full px-6 shadow-lg"
-          onClick={() => window.location.href = '/auth'}
+          onClick={() => navigate('/auth')}
         >
           Sign Up 🎉
         </Button>
@@ -132,21 +133,21 @@ const Index = () => {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => navigate('/auth')}
               >
                 💡 Start Learning
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => navigate('/auth')}
               >
                 🤝 Find a Mentor
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-lavender-500 to-lavender-600 hover:from-lavender-600 hover:to-lavender-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => navigate('/auth')}
               >
                 🧘 Relax Mode
               </Button>
@@ -196,6 +197,7 @@ const Index = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 
@@ -527,12 +529,9 @@ const Index = () => {
 
   const renderSection = () => {
     if (!user) return <LandingSection />;
-    if (activeSection === 'home') return <Dashboard />;
-    if (activeSection === 'learning') return <LearningHub />;
-    if (activeSection === 'mentorship') return <MentorshipDashboard />;
     if (activeSection === 'community') return <CommunityWall />;
-    if (activeSection === 'toolkit') return <LifeToolkit />;
-    return <Dashboard />;
+    // Default to landing for authenticated users on main page
+    return <LandingSection />;
   };
 
   return (
