@@ -1,14 +1,44 @@
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, Star, MessageCircle, BookOpen, Users, Shield, Sparkles, Trophy, Calendar, User, Home, GraduationCap, MessageSquare, Activity, Bell, Search, Play, CheckCircle, Clock, Award, Target, Palette, Send, Camera, Volume2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { LearningHub } from '@/components/learning/LearningHub';
 import { MentorshipDashboard } from '@/components/mentorship/MentorshipDashboard';
-import { CommunityEvents } from '@/components/community/CommunityEvents';
+import { Footer } from '@/components/layout/Footer';
+import { 
+  BookOpen, 
+  Users, 
+  Heart, 
+  Star, 
+  MessageCircle, 
+  Calendar,
+  Award,
+  Target,
+  Sparkles,
+  Globe,
+  Shield,
+  Zap,
+  TrendingUp,
+  Clock,
+  ChevronRight,
+  Play,
+  CheckCircle,
+  Trophy,
+  Camera,
+  Mic,
+  Video,
+  PenTool,
+  Code,
+  Palette,
+  Lightbulb,
+  Brain,
+  Smile,
+  ArrowRight
+} from 'lucide-react';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
