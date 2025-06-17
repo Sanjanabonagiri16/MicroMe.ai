@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { LearningHub } from '@/components/learning/LearningHub';
 import { MentorshipDashboard } from '@/components/mentorship/MentorshipDashboard';
+import { CommunityEvents } from '@/components/community/CommunityEvents';
 import { Footer } from '@/components/layout/Footer';
 import { 
   BookOpen, 
@@ -37,7 +39,12 @@ import {
   Lightbulb,
   Brain,
   Smile,
-  ArrowRight
+  ArrowRight,
+  Home,
+  GraduationCap,
+  MessageSquare,
+  Activity,
+  Bell
 } from 'lucide-react';
 
 const Index = () => {
