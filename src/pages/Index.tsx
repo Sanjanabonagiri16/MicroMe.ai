@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -92,10 +93,10 @@ const Index = () => {
           </div>
         </div>
         <div className="hidden md:flex space-x-6 font-nunito">
-          <a href="#" className="text-gray-600 hover:text-coral-500 transition-colors">Home</a>
-          <a href="#" className="text-gray-600 hover:text-coral-500 transition-colors">Mentors</a>
-          <a href="#" className="text-gray-600 hover:text-coral-500 transition-colors">Learn</a>
-          <a href="#" className="text-gray-600 hover:text-coral-500 transition-colors">Journal</a>
+          <button onClick={() => navigate('/home')} className="text-gray-600 hover:text-coral-500 transition-colors">Home</button>
+          <button onClick={() => navigate('/mentors')} className="text-gray-600 hover:text-coral-500 transition-colors">Mentors</button>
+          <button onClick={() => navigate('/learn')} className="text-gray-600 hover:text-coral-500 transition-colors">Learn</button>
+          <button onClick={() => navigate('/journal')} className="text-gray-600 hover:text-coral-500 transition-colors">Journal</button>
         </div>
         <Button 
           className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white font-nunito rounded-full px-6 shadow-lg"
@@ -133,21 +134,21 @@ const Index = () => {
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/learn')}
               >
                 💡 Start Learning
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/mentors')}
               >
                 🤝 Find a Mentor
               </Button>
               <Button 
                 size="lg" 
                 className="bg-gradient-to-r from-lavender-500 to-lavender-600 hover:from-lavender-600 hover:to-lavender-700 text-white px-10 py-4 text-xl font-poppins rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/journal')}
               >
                 🧘 Relax Mode
               </Button>
@@ -569,5 +570,331 @@ const Index = () => {
     </div>
   );
 };
+
+const Dashboard = () => (
+  <div className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-coral-50">
+    <div className="max-w-7xl mx-auto p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8 bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+        <div>
+          <h1 className="text-3xl font-bold font-poppins text-gray-800 mb-2">
+            Welcome back, Beautiful! 💖
+          </h1>
+          <p className="text-lg text-lavender-600 font-nunito">"You are enough, just as you are today! ✨"</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="sm" className="relative">
+            <Bell className="h-5 w-5 text-coral-500" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-coral-500 rounded-full"></span>
+          </Button>
+          <Button variant="ghost">
+            Sign Out
+          </Button>
+          <Avatar className="w-12 h-12 border-2 border-lavender-300">
+            <AvatarFallback className="bg-gradient-to-br from-coral-400 to-lavender-500 text-white font-bold">
+              U
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid md:grid-cols-4 gap-6 mb-8">
+        {[
+          { label: "Skills Learned", value: "12", icon: GraduationCap, color: "coral", bg: "from-coral-400 to-coral-500" },
+          { label: "Sessions Attended", value: "8", icon: Calendar, color: "lavender", bg: "from-lavender-400 to-lavender-500" },
+          { label: "Badges Earned", value: "5", icon: Trophy, color: "teal", bg: "from-teal-400 to-teal-500" },
+          { label: "Community Posts", value: "15", icon: Star, color: "coral", bg: "from-coral-400 to-coral-500" }
+        ].map(({ label, value, icon: Icon, color, bg }, index) => (
+          <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1 font-nunito">{label}</p>
+                  <p className="text-3xl font-bold text-gray-800 font-poppins">{value}</p>
+                </div>
+                <div className={`w-16 h-16 bg-gradient-to-br ${bg} rounded-2xl flex items-center justify-center shadow-lg`}>
+                  <Icon className="text-white" size={28} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Progress Section */}
+        <Card className="border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-poppins text-lavender-700 flex items-center">
+              📈 This Week's Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="bg-gradient-to-r from-coral-50 to-coral-100 p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-semibold font-nunito text-gray-800">Confidence Building Course</span>
+                <span className="text-sm text-coral-600 font-bold">75%</span>
+              </div>
+              <Progress value={75} className="h-3 mb-4" />
+              <div className="flex items-center justify-between">
+                <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-100 font-nunito">
+                  3 lessons remaining
+                </Badge>
+                <Button size="sm" className="bg-coral-500 hover:bg-coral-600 text-white rounded-full">
+                  Continue ▶️
+                </Button>
+              </div>
+            </div>
+            <div className="bg-gradient-to-r from-lavender-50 to-lavender-100 p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-semibold font-nunito text-gray-800">Digital Safety Basics</span>
+                <span className="text-sm text-lavender-600 font-bold">30%</span>
+              </div>
+              <Progress value={30} className="h-3" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Daily Inspiration & Next Session */}
+        <div className="space-y-6">
+          <Card className="border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl font-poppins text-coral-700 flex items-center">
+                🌟 Daily Inspiration
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center bg-gradient-to-br from-coral-50 to-lavender-50 p-6 rounded-2xl">
+                <div className="w-20 h-20 bg-gradient-to-br from-coral-400 to-lavender-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
+                  <Sparkles className="text-white" size={32} />
+                </div>
+                <p className="text-gray-700 italic font-nunito text-lg mb-3">
+                  "The future belongs to those who believe in the beauty of their dreams."
+                </p>
+                <p className="text-sm text-gray-500 font-medium">- Eleanor Roosevelt</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl font-poppins text-teal-700 flex items-center">
+                📅 Next Session
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gradient-to-r from-teal-50 to-teal-100 p-6 rounded-2xl mb-6">
+                <div className="flex items-center space-x-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarFallback className="bg-gradient-to-br from-teal-400 to-teal-500 text-white text-lg font-bold">
+                      DR
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-800 font-poppins">Dr. Meera Rao</h4>
+                    <p className="text-sm text-gray-600 font-nunito">Software Engineer & Tech Lead</p>
+                    <p className="text-sm text-teal-600 font-semibold">Tomorrow, 4:30 PM</p>
+                  </div>
+                  <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-4">
+                    Join Session 🚀
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const CommunityWall = () => (
+  <div className="min-h-screen bg-gradient-to-br from-coral-50 via-white to-lavender-50 p-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold font-poppins text-gray-800 mb-4">💫 Community Wall</h1>
+        <p className="text-xl text-gray-600 font-nunito">Share your story, inspire others</p>
+      </div>
+
+      {/* Create Post */}
+      <Card className="border-0 shadow-xl mb-8">
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-4">
+            <Avatar className="w-12 h-12">
+              <AvatarFallback className="bg-gradient-to-br from-coral-400 to-coral-500 text-white font-bold">
+                U
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 flex space-x-3">
+              <input 
+                type="text" 
+                placeholder="What's inspiring you today? ✨" 
+                className="flex-1 p-4 border border-gray-200 rounded-full focus:outline-none focus:border-coral-400 font-nunito"
+              />
+              <Button className="bg-coral-500 hover:bg-coral-600 text-white rounded-full px-6 font-poppins">
+                Share Your Spark ✨
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Community Events */}
+      <CommunityEvents />
+
+      {/* Posts Grid - Pinterest Style */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold font-poppins text-gray-800 mb-6">Recent Community Posts</h2>
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          {[
+            {
+              author: "Ananya K.",
+              content: "Just finished my first coding project! 🎉 It's a simple calculator but I'm so proud. Thank you to my mentor Priya for believing in me!",
+              likes: 45,
+              comments: 12,
+              color: "coral"
+            },
+            {
+              author: "Riya M.",
+              content: "Poem I wrote today:\n\n'She believed she could,\nSo she did.\nOne step at a time,\nOne dream fulfilled.'",
+              likes: 67,
+              comments: 8,
+              color: "lavender"
+            },
+            {
+              author: "Kavya S.",
+              content: "Sharing my art piece about women supporting women. Every stroke represents strength! 🎨",
+              likes: 89,
+              comments: 15,
+              color: "teal"
+            }
+          ].map((post, index) => (
+            <Card key={index} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 break-inside-avoid mb-6 cursor-pointer group">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Avatar className="w-12 h-12">
+                    <AvatarFallback className={`bg-gradient-to-br from-${post.color}-400 to-${post.color}-500 text-white font-bold`}>
+                      {post.author[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-800 font-poppins">{post.author}</p>
+                    <p className="text-xs text-gray-500 font-nunito">2 hours ago</p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-700 mb-4 whitespace-pre-line font-nunito leading-relaxed">{post.content}</p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <button className="flex items-center space-x-2 text-coral-500 hover:text-coral-600 transition-colors group-hover:animate-pulse">
+                      <Heart size={18} />
+                      <span className="font-nunito">{post.likes}</span>
+                    </button>
+                    <button className="flex items-center space-x-2 text-gray-500 hover:text-gray-600 transition-colors">
+                      <MessageCircle size={18} />
+                      <span className="font-nunito">{post.comments}</span>
+                    </button>
+                  </div>
+                  <Badge className="bg-gradient-to-r from-coral-400 to-lavender-400 text-white font-nunito">
+                    🌟 Empowered
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const LifeToolkit = () => (
+  <div className="min-h-screen bg-gradient-to-br from-teal-50 via-lavender-50 to-coral-50 p-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold font-poppins text-gray-800 mb-4">🛠️ Life Toolkit</h1>
+        <p className="text-xl text-gray-600 font-nunito">Tools for your wellbeing and growth</p>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Mood Journal */}
+        <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <CardHeader>
+            <CardTitle className="text-xl font-poppins text-coral-700 flex items-center">
+              🌈 Mood Journal
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 mb-4 font-nunito">How are you feeling today?</p>
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {['😊', '😌', '🤗', '😔', '😴', '🤔'].map((emoji, index) => (
+                <button 
+                  key={index}
+                  className="p-4 text-3xl hover:bg-coral-100 rounded-2xl transition-all duration-300 hover:scale-110"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+            <Button className="w-full bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 text-white rounded-full font-poppins">
+              Log Mood 📝
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Meditation Corner */}
+        <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <CardHeader>
+            <CardTitle className="text-xl font-poppins text-teal-700 flex items-center">
+              🧘‍♀️ Meditation Corner
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center mb-6">
+              <div className="w-32 h-32 bg-gradient-to-br from-teal-400 to-lavender-400 rounded-full mx-auto mb-4 flex items-center justify-center animate-pulse-slow">
+                <div className="w-20 h-20 bg-white/30 rounded-full animate-pulse"></div>
+              </div>
+              <p className="text-gray-600 font-nunito">Find your calm</p>
+            </div>
+            <div className="space-y-3">
+              {[
+                { emoji: '🌸', text: '5-min Breathing' },
+                { emoji: '🌙', text: 'Sleep Stories' },
+                { emoji: '⭐', text: 'Confidence Meditation' }
+              ].map((item, index) => (
+                <Button key={index} variant="outline" className="w-full justify-start rounded-full font-nunito hover:bg-teal-50">
+                  <span className="mr-2">{item.emoji}</span>
+                  {item.text}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Health Tracker */}
+        <Card className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+          <CardHeader>
+            <CardTitle className="text-xl font-poppins text-lavender-700 flex items-center">
+              🌺 Health Tracker
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-gradient-to-r from-lavender-50 to-lavender-100 p-6 rounded-2xl mb-4">
+              <h4 className="font-semibold text-gray-800 mb-2 font-poppins">Period Tracker</h4>
+              <p className="text-sm text-gray-600 mb-3 font-nunito">Next cycle in 12 days</p>
+              <Progress value={60} className="h-3" />
+            </div>
+            <Button className="w-full bg-gradient-to-r from-lavender-500 to-lavender-600 hover:from-lavender-600 hover:to-lavender-700 text-white rounded-full font-poppins">
+              View Calendar 📅
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+);
 
 export default Index;
