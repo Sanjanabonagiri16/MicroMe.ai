@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Heart, Sparkles, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 type UserRole = 'girl' | 'mentor' | 'parent_guardian';
 
@@ -30,16 +32,49 @@ export const AuthPage = () => {
     password: '',
   });
   const { toast } = useToast();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
   const interestOptions = [
     'Art & Creativity', 'Technology', 'Sports', 'Music', 'Reading', 
     'Leadership', 'Science', 'Fashion', 'Cooking', 'Photography'
   ];
 
+  // Redirect authenticated users to home
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/home');
+    }
+  }, [user, loading, navigate]);
+
+  // Don't render if still loading or user is authenticated
+  if (loading || user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Validate required fields
+    if (!signUpData.email || !signUpData.password || !signUpData.firstName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate parent email for underage users
     if (parseInt(signUpData.age) < 18 && !signUpData.parentEmail) {
       toast({
         title: "Parent Email Required",
@@ -51,32 +86,58 @@ export const AuthPage = () => {
     }
 
     try {
+      console.log('Starting signup process...', {
+        email: signUpData.email,
+        firstName: signUpData.firstName,
+        role: signUpData.role,
+        age: signUpData.age
+      });
+
       const { error } = await supabase.auth.signUp({
         email: signUpData.email,
         password: signUpData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/home`,
           data: {
             first_name: signUpData.firstName,
-            last_name: signUpData.lastName,
+            last_name: signUpData.lastName || '',
             role: signUpData.role,
-            age: parseInt(signUpData.age),
-            parent_email: signUpData.parentEmail,
-            interests: signUpData.interests,
+            age: signUpData.age,
+            parent_email: signUpData.parentEmail || null,
+            interests: JSON.stringify(signUpData.interests),
           }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Signup error:', error);
+        throw error;
+      }
 
+      console.log('Signup successful!');
+      
       toast({
         title: "Welcome to Microme.ai! 🌟",
-        description: "Please check your email to verify your account.",
+        description: "Please check your email to verify your account, then sign in.",
       });
+
+      // Clear form and switch to sign in tab
+      setSignUpData({
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        age: '',
+        role: 'girl',
+        parentEmail: '',
+        interests: [],
+      });
+
     } catch (error: any) {
+      console.error('Signup failed:', error);
       toast({
         title: "Sign Up Failed",
-        description: error.message,
+        description: error.message || "An unexpected error occurred during signup.",
         variant: "destructive",
       });
     } finally {
@@ -89,21 +150,30 @@ export const AuthPage = () => {
     setIsLoading(true);
 
     try {
+      console.log('Starting signin process...', { email: signInData.email });
+
       const { error } = await supabase.auth.signInWithPassword({
         email: signInData.email,
         password: signInData.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Signin error:', error);
+        throw error;
+      }
 
+      console.log('Signin successful!');
+      
       toast({
         title: "Welcome back! ✨",
         description: "You're successfully logged in.",
       });
+
     } catch (error: any) {
+      console.error('Signin failed:', error);
       toast({
         title: "Sign In Failed",
-        description: error.message,
+        description: error.message || "Invalid login credentials.",
         variant: "destructive",
       });
     } finally {
@@ -150,12 +220,13 @@ export const AuthPage = () => {
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">First Name *</Label>
                       <Input
                         id="firstName"
                         value={signUpData.firstName}
                         onChange={(e) => setSignUpData({...signUpData, firstName: e.target.value})}
                         required
+                        placeholder="Enter your first name"
                       />
                     </div>
                     <div>
@@ -164,35 +235,39 @@ export const AuthPage = () => {
                         id="lastName"
                         value={signUpData.lastName}
                         onChange={(e) => setSignUpData({...signUpData, lastName: e.target.value})}
+                        placeholder="Enter your last name"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email *</Label>
                     <Input
                       id="email"
                       type="email"
                       value={signUpData.email}
                       onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
                       required
+                      placeholder="Enter your email"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">Password *</Label>
                     <Input
                       id="password"
                       type="password"
                       value={signUpData.password}
                       onChange={(e) => setSignUpData({...signUpData, password: e.target.value})}
                       required
+                      placeholder="Create a password"
+                      minLength={6}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="age">Age</Label>
+                      <Label htmlFor="age">Age *</Label>
                       <Input
                         id="age"
                         type="number"
@@ -201,10 +276,11 @@ export const AuthPage = () => {
                         value={signUpData.age}
                         onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
                         required
+                        placeholder="Your age"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="role">I am a...</Label>
+                      <Label htmlFor="role">I am a... *</Label>
                       <Select value={signUpData.role} onValueChange={(value: UserRole) => setSignUpData({...signUpData, role: value})}>
                         <SelectTrigger>
                           <SelectValue />
@@ -220,13 +296,14 @@ export const AuthPage = () => {
 
                   {parseInt(signUpData.age) < 18 && (
                     <div>
-                      <Label htmlFor="parentEmail">Parent's Email (Required for under 18)</Label>
+                      <Label htmlFor="parentEmail">Parent's Email (Required for under 18) *</Label>
                       <Input
                         id="parentEmail"
                         type="email"
                         value={signUpData.parentEmail}
                         onChange={(e) => setSignUpData({...signUpData, parentEmail: e.target.value})}
                         required
+                        placeholder="Parent's email address"
                       />
                     </div>
                   )}
@@ -269,6 +346,7 @@ export const AuthPage = () => {
                       value={signInData.email}
                       onChange={(e) => setSignInData({...signInData, email: e.target.value})}
                       required
+                      placeholder="Enter your email"
                     />
                   </div>
 
@@ -280,6 +358,7 @@ export const AuthPage = () => {
                       value={signInData.password}
                       onChange={(e) => setSignInData({...signInData, password: e.target.value})}
                       required
+                      placeholder="Enter your password"
                     />
                   </div>
 
