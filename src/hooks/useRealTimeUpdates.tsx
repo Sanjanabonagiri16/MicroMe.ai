@@ -1,52 +1,84 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
-interface CourseEnrollment {
+interface UserProgress {
   id: string;
-  course_id: string;
-  progress_percentage: number;
-  last_watched_position: number;
-  completed_at: string | null;
+  lesson_id: string;
+  user_id: string;
+  score: number;
+  completed_at: string;
+  time_spent: number;
 }
 
-interface MentorBooking {
+interface MoodEntry {
   id: string;
-  mentor_id: string;
-  scheduled_at: string;
-  status: string;
-  notes: string | null;
+  user_id: string;
+  mood: string;
+  intensity: number;
+  notes: string;
+  gratitude_note: string;
+  created_at: string;
+}
+
+interface CommunityPost {
+  id: string;
+  user_id: string;
+  content: string;
+  content_type: string;
+  likes_count: number;
+  is_approved: boolean;
+  created_at: string;
 }
 
 export const useRealTimeUpdates = () => {
   const { user } = useAuth();
-  const [enrollments, setEnrollments] = useState<CourseEnrollment[]>([]);
-  const [bookings, setBookings] = useState<MentorBooking[]>([]);
+  const [userProgress, setUserProgress] = useState<UserProgress[]>([]);
+  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch initial data
   useEffect(() => {
     if (!user) return;
 
-    // Fetch initial data
     const fetchInitialData = async () => {
       try {
-        // Fetch course enrollments
-        const { data: enrollmentData } = await supabase
-          .from('user_course_enrollments')
+        // Fetch user progress
+        const { data: progressData } = await supabase
+          .from('user_progress')
           .select('*')
           .eq('user_id', user.id);
-        
-        if (enrollmentData) setEnrollments(enrollmentData);
 
-        // Fetch mentor bookings
-        const { data: bookingData } = await supabase
-          .from('mentor_bookings')
+        if (progressData) {
+          setUserProgress(progressData as UserProgress[]);
+        }
+
+        // Fetch mood entries
+        const { data: moodData } = await supabase
+          .from('mood_entries')
           .select('*')
-          .eq('user_id', user.id);
-        
-        if (bookingData) setBookings(bookingData);
-        
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (moodData) {
+          setMoodEntries(moodData as MoodEntry[]);
+        }
+
+        // Fetch community posts
+        const { data: postsData } = await supabase
+          .from('community_posts')
+          .select('*')
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (postsData) {
+          setCommunityPosts(postsData as CommunityPost[]);
+        }
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching initial data:', error);
@@ -55,143 +87,176 @@ export const useRealTimeUpdates = () => {
     };
 
     fetchInitialData();
+  }, [user]);
 
-    // Set up real-time subscriptions
-    const enrollmentChannel = supabase
-      .channel('user-course-enrollments-changes')
+  // Set up real-time subscriptions
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscribe to user progress changes
+    const progressChannel = supabase
+      .channel('user-progress-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'user_course_enrollments',
+          table: 'user_progress',
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('Course enrollment update:', payload);
-          
+          console.log('User progress change:', payload);
           if (payload.eventType === 'INSERT') {
-            setEnrollments(prev => [...prev, payload.new as CourseEnrollment]);
+            setUserProgress(prev => [...prev, payload.new as UserProgress]);
           } else if (payload.eventType === 'UPDATE') {
-            setEnrollments(prev => 
-              prev.map(enrollment => 
-                enrollment.id === payload.new.id 
-                  ? payload.new as CourseEnrollment 
-                  : enrollment
+            setUserProgress(prev => 
+              prev.map(item => 
+                item.id === payload.new.id ? payload.new as UserProgress : item
               )
             );
           } else if (payload.eventType === 'DELETE') {
-            setEnrollments(prev => 
-              prev.filter(enrollment => enrollment.id !== payload.old.id)
+            setUserProgress(prev => 
+              prev.filter(item => item.id !== payload.old.id)
             );
           }
         }
       )
       .subscribe();
 
-    const bookingChannel = supabase
-      .channel('mentor-bookings-changes')
+    // Subscribe to mood entries changes
+    const moodChannel = supabase
+      .channel('mood-entries-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'mentor_bookings',
+          table: 'mood_entries',
           filter: `user_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('Mentor booking update:', payload);
-          
+          console.log('Mood entry change:', payload);
           if (payload.eventType === 'INSERT') {
-            setBookings(prev => [...prev, payload.new as MentorBooking]);
+            setMoodEntries(prev => [payload.new as MoodEntry, ...prev.slice(0, 9)]);
           } else if (payload.eventType === 'UPDATE') {
-            setBookings(prev => 
-              prev.map(booking => 
-                booking.id === payload.new.id 
-                  ? payload.new as MentorBooking 
-                  : booking
+            setMoodEntries(prev => 
+              prev.map(item => 
+                item.id === payload.new.id ? payload.new as MoodEntry : item
               )
             );
           } else if (payload.eventType === 'DELETE') {
-            setBookings(prev => 
-              prev.filter(booking => booking.id !== payload.old.id)
+            setMoodEntries(prev => 
+              prev.filter(item => item.id !== payload.old.id)
             );
           }
         }
       )
       .subscribe();
 
-    // Cleanup subscriptions
+    // Subscribe to community posts changes
+    const postsChannel = supabase
+      .channel('community-posts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_posts'
+        },
+        (payload) => {
+          console.log('Community post change:', payload);
+          if (payload.eventType === 'INSERT' && payload.new.is_approved) {
+            setCommunityPosts(prev => [payload.new as CommunityPost, ...prev.slice(0, 19)]);
+          } else if (payload.eventType === 'UPDATE') {
+            setCommunityPosts(prev => 
+              prev.map(item => 
+                item.id === payload.new.id ? payload.new as CommunityPost : item
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setCommunityPosts(prev => 
+              prev.filter(item => item.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup function
     return () => {
-      supabase.removeChannel(enrollmentChannel);
-      supabase.removeChannel(bookingChannel);
+      supabase.removeChannel(progressChannel);
+      supabase.removeChannel(moodChannel);
+      supabase.removeChannel(postsChannel);
     };
   }, [user]);
 
-  const enrollInCourse = async (courseId: string) => {
-    if (!user) return;
+  // Function to create a new mood entry
+  const createMoodEntry = async (moodData: {
+    mood: string;
+    intensity: number;
+    notes?: string;
+    gratitude_note?: string;
+  }) => {
+    if (!user) return null;
 
     try {
-      const { error } = await supabase
-        .from('user_course_enrollments')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          progress_percentage: 0
-        });
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .insert([
+          {
+            user_id: user.id,
+            ...moodData
+          }
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Error enrolling in course:', error);
+      console.error('Error creating mood entry:', error);
+      return null;
     }
   };
 
-  const updateCourseProgress = async (courseId: string, progress: number, watchPosition: number = 0) => {
-    if (!user) return;
+  // Function to create a community post
+  const createCommunityPost = async (postData: {
+    content: string;
+    content_type?: string;
+    is_anonymous?: boolean;
+    image_url?: string;
+  }) => {
+    if (!user) return null;
 
     try {
-      const { error } = await supabase
-        .from('user_course_enrollments')
-        .update({
-          progress_percentage: progress,
-          last_watched_position: watchPosition,
-          completed_at: progress >= 100 ? new Date().toISOString() : null
-        })
-        .eq('user_id', user.id)
-        .eq('course_id', courseId);
+      const { data, error } = await supabase
+        .from('community_posts')
+        .insert([
+          {
+            user_id: user.id,
+            content_type: 'story',
+            is_anonymous: false,
+            is_approved: true,
+            ...postData
+          }
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
+      return data;
     } catch (error) {
-      console.error('Error updating course progress:', error);
-    }
-  };
-
-  const bookMentor = async (mentorId: string, scheduledAt: string, notes?: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
-        .from('mentor_bookings')
-        .insert({
-          user_id: user.id,
-          mentor_id: mentorId,
-          scheduled_at: scheduledAt,
-          notes: notes,
-          status: 'scheduled'
-        });
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error booking mentor:', error);
+      console.error('Error creating community post:', error);
+      return null;
     }
   };
 
   return {
-    enrollments,
-    bookings,
+    userProgress,
+    moodEntries,
+    communityPosts,
     loading,
-    enrollInCourse,
-    updateCourseProgress,
-    bookMentor
+    createMoodEntry,
+    createCommunityPost
   };
 };
