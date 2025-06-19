@@ -63,29 +63,23 @@ export const AuthPage = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validate required fields
-    if (!signUpData.email || !signUpData.password || !signUpData.firstName) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    // Validate parent email for underage users
-    if (parseInt(signUpData.age) < 18 && !signUpData.parentEmail) {
-      toast({
-        title: "Parent Email Required",
-        description: "Users under 18 need parental consent. Please provide a parent's email.",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      // Validate required fields
+      if (!signUpData.email || !signUpData.password || !signUpData.firstName) {
+        throw new Error("Please fill in all required fields.");
+      }
+
+      // Validate age
+      const ageNumber = parseInt(signUpData.age);
+      if (!ageNumber || ageNumber < 10 || ageNumber > 25) {
+        throw new Error("Age must be between 10 and 25.");
+      }
+
+      // Validate parent email for underage users
+      if (ageNumber < 18 && !signUpData.parentEmail) {
+        throw new Error("Users under 18 need parental consent. Please provide a parent's email.");
+      }
+
       console.log('Starting signup process...', {
         email: signUpData.email,
         firstName: signUpData.firstName,
@@ -93,16 +87,16 @@ export const AuthPage = () => {
         age: signUpData.age
       });
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: signUpData.email,
         password: signUpData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/home`,
           data: {
             first_name: signUpData.firstName,
-            last_name: signUpData.lastName || '',
+            last_name: signUpData.lastName || null,
             role: signUpData.role,
-            age: signUpData.age,
+            age: ageNumber.toString(),
             parent_email: signUpData.parentEmail || null,
             interests: JSON.stringify(signUpData.interests),
           }
@@ -114,14 +108,21 @@ export const AuthPage = () => {
         throw error;
       }
 
-      console.log('Signup successful!');
+      console.log('Signup successful!', data);
       
       toast({
         title: "Welcome to Microme.ai! 🌟",
-        description: "Please check your email to verify your account, then sign in.",
+        description: data.user?.email_confirmed_at 
+          ? "You're all set! Redirecting you to your dashboard..." 
+          : "Please check your email to verify your account, then sign in.",
       });
 
-      // Clear form and switch to sign in tab
+      // If email is already confirmed, redirect immediately
+      if (data.user?.email_confirmed_at) {
+        setTimeout(() => navigate('/home'), 1500);
+      }
+
+      // Clear form
       setSignUpData({
         email: '',
         password: '',
@@ -135,9 +136,21 @@ export const AuthPage = () => {
 
     } catch (error: any) {
       console.error('Signup failed:', error);
+      let errorMessage = "An unexpected error occurred during signup.";
+      
+      if (error.message?.includes('already registered')) {
+        errorMessage = "This email is already registered. Please try signing in instead.";
+      } else if (error.message?.includes('password')) {
+        errorMessage = "Password must be at least 6 characters long.";
+      } else if (error.message?.includes('email')) {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Sign Up Failed",
-        description: error.message || "An unexpected error occurred during signup.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -150,9 +163,13 @@ export const AuthPage = () => {
     setIsLoading(true);
 
     try {
+      if (!signInData.email || !signInData.password) {
+        throw new Error("Please enter both email and password.");
+      }
+
       console.log('Starting signin process...', { email: signInData.email });
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: signInData.email,
         password: signInData.password,
       });
@@ -162,18 +179,30 @@ export const AuthPage = () => {
         throw error;
       }
 
-      console.log('Signin successful!');
+      console.log('Signin successful!', data);
       
       toast({
         title: "Welcome back! ✨",
         description: "You're successfully logged in.",
       });
 
+      // The useAuth hook will handle the redirect via useEffect
+
     } catch (error: any) {
       console.error('Signin failed:', error);
+      let errorMessage = "Invalid login credentials.";
+      
+      if (error.message?.includes('email not confirmed')) {
+        errorMessage = "Please check your email and confirm your account before signing in.";
+      } else if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = "Invalid email or password. Please check your credentials and try again.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Sign In Failed",
-        description: error.message || "Invalid login credentials.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -227,6 +256,7 @@ export const AuthPage = () => {
                         onChange={(e) => setSignUpData({...signUpData, firstName: e.target.value})}
                         required
                         placeholder="Enter your first name"
+                        disabled={isLoading}
                       />
                     </div>
                     <div>
@@ -236,6 +266,7 @@ export const AuthPage = () => {
                         value={signUpData.lastName}
                         onChange={(e) => setSignUpData({...signUpData, lastName: e.target.value})}
                         placeholder="Enter your last name"
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
@@ -249,6 +280,7 @@ export const AuthPage = () => {
                       onChange={(e) => setSignUpData({...signUpData, email: e.target.value})}
                       required
                       placeholder="Enter your email"
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -260,8 +292,9 @@ export const AuthPage = () => {
                       value={signUpData.password}
                       onChange={(e) => setSignUpData({...signUpData, password: e.target.value})}
                       required
-                      placeholder="Create a password"
+                      placeholder="Create a password (min 6 characters)"
                       minLength={6}
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -277,11 +310,16 @@ export const AuthPage = () => {
                         onChange={(e) => setSignUpData({...signUpData, age: e.target.value})}
                         required
                         placeholder="Your age"
+                        disabled={isLoading}
                       />
                     </div>
                     <div>
                       <Label htmlFor="role">I am a... *</Label>
-                      <Select value={signUpData.role} onValueChange={(value: UserRole) => setSignUpData({...signUpData, role: value})}>
+                      <Select 
+                        value={signUpData.role} 
+                        onValueChange={(value: UserRole) => setSignUpData({...signUpData, role: value})}
+                        disabled={isLoading}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -294,7 +332,7 @@ export const AuthPage = () => {
                     </div>
                   </div>
 
-                  {parseInt(signUpData.age) < 18 && (
+                  {parseInt(signUpData.age) < 18 && signUpData.age !== '' && (
                     <div>
                       <Label htmlFor="parentEmail">Parent's Email (Required for under 18) *</Label>
                       <Input
@@ -304,6 +342,7 @@ export const AuthPage = () => {
                         onChange={(e) => setSignUpData({...signUpData, parentEmail: e.target.value})}
                         required
                         placeholder="Parent's email address"
+                        disabled={isLoading}
                       />
                     </div>
                   )}
@@ -318,6 +357,7 @@ export const AuthPage = () => {
                               id={interest}
                               checked={signUpData.interests.includes(interest)}
                               onCheckedChange={() => toggleInterest(interest)}
+                              disabled={isLoading}
                             />
                             <Label htmlFor={interest} className="text-sm">{interest}</Label>
                           </div>
@@ -347,6 +387,7 @@ export const AuthPage = () => {
                       onChange={(e) => setSignInData({...signInData, email: e.target.value})}
                       required
                       placeholder="Enter your email"
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -359,6 +400,7 @@ export const AuthPage = () => {
                       onChange={(e) => setSignInData({...signInData, password: e.target.value})}
                       required
                       placeholder="Enter your password"
+                      disabled={isLoading}
                     />
                   </div>
 
