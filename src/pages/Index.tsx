@@ -87,9 +87,9 @@ const Index = () => {
             <div className="mb-8 animate-fade-in">
               <span className="text-6xl mb-4 block animate-bounce">🌸</span>
               <h1 className="text-5xl md:text-7xl font-bold text-gray-800 mb-6 leading-tight animate-scale-in">
-                Welcome to 2025. <br />
+                Code. Create. Conquer. <br />
                 <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                  The Future is Female.
+                  The Digital Age is Yours.
                 </span>
               </h1>
             </div>
