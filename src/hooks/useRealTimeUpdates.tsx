@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import type { Database } from '@/integrations/supabase/types';
 
+// Type definitions based on existing database tables
 interface UserProgress {
   id: string;
   lesson_id: string;
@@ -15,7 +17,7 @@ interface UserProgress {
 interface MoodEntry {
   id: string;
   user_id: string;
-  mood: string;
+  mood: Database['public']['Enums']['mood_type'];
   intensity: number;
   notes: string;
   gratitude_note: string;
@@ -26,7 +28,7 @@ interface CommunityPost {
   id: string;
   user_id: string;
   content: string;
-  content_type: string;
+  content_type: Database['public']['Enums']['content_type'];
   likes_count: number;
   is_approved: boolean;
   created_at: string;
@@ -45,37 +47,48 @@ export const useRealTimeUpdates = () => {
 
     const fetchInitialData = async () => {
       try {
+        console.log('Fetching initial data for user:', user.id);
+
         // Fetch user progress
-        const { data: progressData } = await supabase
+        const { data: progressData, error: progressError } = await supabase
           .from('user_progress')
           .select('*')
           .eq('user_id', user.id);
 
-        if (progressData) {
+        if (progressError) {
+          console.error('Error fetching user progress:', progressError);
+        } else if (progressData) {
+          console.log('Fetched user progress:', progressData);
           setUserProgress(progressData as UserProgress[]);
         }
 
         // Fetch mood entries
-        const { data: moodData } = await supabase
+        const { data: moodData, error: moodError } = await supabase
           .from('mood_entries')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(10);
 
-        if (moodData) {
+        if (moodError) {
+          console.error('Error fetching mood entries:', moodError);
+        } else if (moodData) {
+          console.log('Fetched mood entries:', moodData);
           setMoodEntries(moodData as MoodEntry[]);
         }
 
         // Fetch community posts
-        const { data: postsData } = await supabase
+        const { data: postsData, error: postsError } = await supabase
           .from('community_posts')
           .select('*')
           .eq('is_approved', true)
           .order('created_at', { ascending: false })
           .limit(20);
 
-        if (postsData) {
+        if (postsError) {
+          console.error('Error fetching community posts:', postsError);
+        } else if (postsData) {
+          console.log('Fetched community posts:', postsData);
           setCommunityPosts(postsData as CommunityPost[]);
         }
 
@@ -92,6 +105,8 @@ export const useRealTimeUpdates = () => {
   // Set up real-time subscriptions
   useEffect(() => {
     if (!user) return;
+
+    console.log('Setting up real-time subscriptions for user:', user.id);
 
     // Subscribe to user progress changes
     const progressChannel = supabase
@@ -184,6 +199,7 @@ export const useRealTimeUpdates = () => {
 
     // Cleanup function
     return () => {
+      console.log('Cleaning up real-time subscriptions');
       supabase.removeChannel(progressChannel);
       supabase.removeChannel(moodChannel);
       supabase.removeChannel(postsChannel);
@@ -192,7 +208,7 @@ export const useRealTimeUpdates = () => {
 
   // Function to create a new mood entry
   const createMoodEntry = async (moodData: {
-    mood: string;
+    mood: Database['public']['Enums']['mood_type'];
     intensity: number;
     notes?: string;
     gratitude_note?: string;
@@ -200,18 +216,26 @@ export const useRealTimeUpdates = () => {
     if (!user) return null;
 
     try {
+      console.log('Creating mood entry:', moodData);
       const { data, error } = await supabase
         .from('mood_entries')
         .insert([
           {
             user_id: user.id,
-            ...moodData
+            mood: moodData.mood,
+            intensity: moodData.intensity,
+            notes: moodData.notes,
+            gratitude_note: moodData.gratitude_note
           }
         ])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating mood entry:', error);
+        throw error;
+      }
+      console.log('Created mood entry:', data);
       return data;
     } catch (error) {
       console.error('Error creating mood entry:', error);
@@ -222,28 +246,34 @@ export const useRealTimeUpdates = () => {
   // Function to create a community post
   const createCommunityPost = async (postData: {
     content: string;
-    content_type?: string;
+    content_type?: Database['public']['Enums']['content_type'];
     is_anonymous?: boolean;
     image_url?: string;
   }) => {
     if (!user) return null;
 
     try {
+      console.log('Creating community post:', postData);
       const { data, error } = await supabase
         .from('community_posts')
         .insert([
           {
             user_id: user.id,
-            content_type: 'story',
-            is_anonymous: false,
+            content: postData.content,
+            content_type: postData.content_type || 'story',
+            is_anonymous: postData.is_anonymous || false,
             is_approved: true,
-            ...postData
+            image_url: postData.image_url
           }
         ])
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating community post:', error);
+        throw error;
+      }
+      console.log('Created community post:', data);
       return data;
     } catch (error) {
       console.error('Error creating community post:', error);
